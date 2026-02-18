@@ -49,6 +49,8 @@ function AppRoutes() {
       <Route path="/maker/dashboard" element={<ProtectedRoute allowedRoles={['anchor_maker']}><MakerDashboard /></ProtectedRoute>} />
       <Route path="/maker/programs" element={<ProtectedRoute allowedRoles={['anchor_maker']}><MakerPrograms /></ProtectedRoute>} />
       <Route path="/maker/invoices" element={<ProtectedRoute allowedRoles={['anchor_maker']}><MakerInvoices /></ProtectedRoute>} />
+      <Route path="/maker/lenders" element={<ProtectedRoute allowedRoles={['anchor_maker']}><MakerLenders /></ProtectedRoute>} />
+      <Route path="/maker/settings" element={<ProtectedRoute allowedRoles={['anchor_maker']}><MakerDashboard /></ProtectedRoute>} />
 
       {/* Anchor Checker Routes */}
       <Route path="/checker/dashboard" element={<ProtectedRoute allowedRoles={['anchor_checker']}><CheckerDashboard /></ProtectedRoute>} />
