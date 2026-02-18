@@ -11,10 +11,10 @@ import MakerLenders from '@/pages/maker/Lenders';
 import CheckerDashboard from '@/pages/checker/Dashboard';
 import CheckerChannelPartners from '@/pages/checker/ChannelPartners';
 import CheckerInvoices from '@/pages/checker/Invoices';
-import CheckerRaiseInvoice from '@/pages/checker/RaiseInvoice';
 import CPDashboard from '@/pages/channelPartner/Dashboard';
-import CPPrograms from '@/pages/channelPartner/Programs';
+import CPChannelPartners from '@/pages/channelPartner/ChannelPartners';
 import CPInvoices from '@/pages/channelPartner/Invoices';
+import CPRepayment from '@/pages/channelPartner/Repayment';
 import '@/App.css';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
@@ -44,33 +44,26 @@ function AppRoutes() {
       <Route path="/" element={<RoleRedirect />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/otp" element={<OTPPage />} />
-
-      {/* Anchor Maker Routes */}
       <Route path="/maker/dashboard" element={<ProtectedRoute allowedRoles={['anchor_maker']}><MakerDashboard /></ProtectedRoute>} />
       <Route path="/maker/programs" element={<ProtectedRoute allowedRoles={['anchor_maker']}><MakerPrograms /></ProtectedRoute>} />
       <Route path="/maker/invoices" element={<ProtectedRoute allowedRoles={['anchor_maker']}><MakerInvoices /></ProtectedRoute>} />
       <Route path="/maker/lenders" element={<ProtectedRoute allowedRoles={['anchor_maker']}><MakerLenders /></ProtectedRoute>} />
       <Route path="/maker/settings" element={<ProtectedRoute allowedRoles={['anchor_maker']}><MakerDashboard /></ProtectedRoute>} />
-
-      {/* Anchor Checker Routes */}
       <Route path="/checker/dashboard" element={<ProtectedRoute allowedRoles={['anchor_checker']}><CheckerDashboard /></ProtectedRoute>} />
       <Route path="/checker/channel-partners" element={<ProtectedRoute allowedRoles={['anchor_checker']}><CheckerChannelPartners /></ProtectedRoute>} />
       <Route path="/checker/invoices" element={<ProtectedRoute allowedRoles={['anchor_checker']}><CheckerInvoices /></ProtectedRoute>} />
-      <Route path="/checker/raise-invoice" element={<ProtectedRoute allowedRoles={['anchor_checker']}><CheckerRaiseInvoice /></ProtectedRoute>} />
       <Route path="/checker/settings" element={<ProtectedRoute allowedRoles={['anchor_checker']}><CheckerDashboard /></ProtectedRoute>} />
-
-      {/* Channel Partner Routes */}
       <Route path="/cp/dashboard" element={<ProtectedRoute allowedRoles={['channel_partner']}><CPDashboard /></ProtectedRoute>} />
-      <Route path="/cp/programs" element={<ProtectedRoute allowedRoles={['channel_partner']}><CPPrograms /></ProtectedRoute>} />
+      <Route path="/cp/channel-partners" element={<ProtectedRoute allowedRoles={['channel_partner']}><CPChannelPartners /></ProtectedRoute>} />
       <Route path="/cp/invoices" element={<ProtectedRoute allowedRoles={['channel_partner']}><CPInvoices /></ProtectedRoute>} />
+      <Route path="/cp/repayment" element={<ProtectedRoute allowedRoles={['channel_partner']}><CPRepayment /></ProtectedRoute>} />
       <Route path="/cp/settings" element={<ProtectedRoute allowedRoles={['channel_partner']}><CPDashboard /></ProtectedRoute>} />
-
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }
 
-function App() {
+export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -80,5 +73,3 @@ function App() {
     </AuthProvider>
   );
 }
-
-export default App;
