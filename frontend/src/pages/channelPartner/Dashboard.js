@@ -23,7 +23,7 @@ export default function CPDashboard() {
     { label: 'My SCF Limit', value: '₹50 Cr', sub: 'Sanctioned by Tata Motors', icon: <IndianRupee size={18} />, color: '#ede9fe', iconColor: '#6d28d9' },
     { label: 'Active Programs', value: programs.length, sub: 'With Tata Motors', icon: <Building2 size={18} />, color: '#d1fae5', iconColor: '#059669' },
     { label: 'Total Invoices', value: stats?.total_invoices ?? '—', sub: 'All submissions', icon: <FileText size={18} />, color: '#fef3c7', iconColor: '#d97706' },
-    { label: 'Approved Invoices', value: stats?.approved ?? '—', sub: `₹${((stats?.approved_amount || 0) / 10000000).toFixed(1)} Cr funded`, icon: <CheckCircle size={18} />, color: '#d1fae5', iconColor: '#059669' },
+    { label: 'Fully Approved', value: stats?.fully_approved ?? '—', sub: `₹${((stats?.approved_amount || 0) / 10000000).toFixed(1)} Cr funded`, icon: <CheckCircle size={18} />, color: '#d1fae5', iconColor: '#059669' },
   ];
 
   return (
@@ -34,7 +34,7 @@ export default function CPDashboard() {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
               <h3 style={{ margin: 0, fontSize: 17, fontWeight: 600 }}>Welcome, {user?.name}</h3>
-              <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>{user?.company} • Channel Partner Portal</p>
+              <p style={{ margin: '4px 0 0', fontSize: 13, color: 'rgba(255,255,255,0.7)' }}>{user?.company} - Channel Partner Portal</p>
             </div>
             <div style={{ textAlign: 'right' }}>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase' }}>Anchor</div>
@@ -57,8 +57,8 @@ export default function CPDashboard() {
         {/* Quick stats */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
           {[
-            { label: 'Pending Approvals', value: stats?.pending_approval ?? 0, sub: 'Awaiting maker review', color: '#fef3c7', text: '#92400e', icon: <Clock size={20} /> },
-            { label: 'Approved This Month', value: stats?.approved ?? 0, sub: 'Successfully processed', color: '#d1fae5', text: '#065f46', icon: <CheckCircle size={20} /> },
+            { label: 'Pending My Approval', value: stats?.approved_l1 ?? 0, sub: 'L1 approved, awaiting your review', color: '#fef3c7', text: '#92400e', icon: <Clock size={20} /> },
+            { label: 'Fully Approved', value: stats?.fully_approved ?? 0, sub: 'Successfully processed', color: '#d1fae5', text: '#065f46', icon: <CheckCircle size={20} /> },
           ].map(item => (
             <div key={item.label} className="scf-stat-card" style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px' }}>
               <div style={{ width: 44, height: 44, borderRadius: 10, background: item.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: item.text }}>{item.icon}</div>
@@ -78,7 +78,6 @@ export default function CPDashboard() {
               <div className="scf-table-title">My Active Programs</div>
               <div className="scf-table-subtitle">SCF programs assigned to you</div>
             </div>
-            <span style={{ fontSize: 12, color: '#6d28d9', cursor: 'pointer', fontWeight: 500 }} onClick={() => navigate('/cp/programs')}>View All →</span>
           </div>
           <div className="scf-table-wrap">
             <table className="scf-table">
