@@ -83,15 +83,15 @@ export default function CheckerChannelPartners() {
                     <td><span className={`scf-badge ${p.type === 'Dealer' ? 'badge-checker' : 'badge-credit'}`}>{p.type}</span></td>
                     <td>{p.city}</td>
                     <td>{p.state}</td>
-                    <td className="scf-amount">₹{(p.limit / 100000).toFixed(0)} L</td>
+                    <td className="scf-amount">₹{(p.sanctioned_limit / 100000).toFixed(0)} L</td>
                     <td>₹{(p.utilized / 100000).toFixed(0)} L</td>
-                    <td style={{ color: '#059669', fontWeight: 500 }}>₹{((p.limit - p.utilized) / 100000).toFixed(0)} L</td>
+                    <td style={{ color: '#059669', fontWeight: 500 }}>₹{(p.available / 100000).toFixed(0)} L</td>
                     <td>
                       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                         <div style={{ flex: 1, height: 6, background: '#f3f4f6', borderRadius: 3, minWidth: 60 }}>
-                          <div style={{ width: `${pct(p.utilized, p.limit)}%`, height: '100%', background: '#7c3aed', borderRadius: 3 }}></div>
+                          <div style={{ width: `${pct(p.utilized, p.sanctioned_limit)}%`, height: '100%', background: '#7c3aed', borderRadius: 3 }}></div>
                         </div>
-                        <span style={{ fontSize: 12, color: '#6b7280' }}>{pct(p.utilized, p.limit)}%</span>
+                        <span style={{ fontSize: 12, color: '#6b7280' }}>{pct(p.utilized, p.sanctioned_limit)}%</span>
                       </div>
                     </td>
                     <td><span className={`scf-badge ${p.status === 'Active' ? 'badge-active' : 'badge-inactive'}`}>{p.status}</span></td>
