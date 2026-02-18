@@ -57,6 +57,7 @@ function AppRoutes() {
       <Route path="/checker/channel-partners" element={<ProtectedRoute allowedRoles={['anchor_checker']}><CheckerChannelPartners /></ProtectedRoute>} />
       <Route path="/checker/invoices" element={<ProtectedRoute allowedRoles={['anchor_checker']}><CheckerInvoices /></ProtectedRoute>} />
       <Route path="/checker/raise-invoice" element={<ProtectedRoute allowedRoles={['anchor_checker']}><CheckerRaiseInvoice /></ProtectedRoute>} />
+      <Route path="/checker/settings" element={<ProtectedRoute allowedRoles={['anchor_checker']}><CheckerDashboard /></ProtectedRoute>} />
 
       {/* Channel Partner Routes */}
       <Route path="/cp/dashboard" element={<ProtectedRoute allowedRoles={['channel_partner']}><CPDashboard /></ProtectedRoute>} />
