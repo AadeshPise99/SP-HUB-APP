@@ -7,6 +7,7 @@ import OTPPage from '@/pages/OTPPage';
 import MakerDashboard from '@/pages/maker/Dashboard';
 import MakerPrograms from '@/pages/maker/Programs';
 import MakerInvoices from '@/pages/maker/Invoices';
+import MakerLenders from '@/pages/maker/Lenders';
 import CheckerDashboard from '@/pages/checker/Dashboard';
 import CheckerChannelPartners from '@/pages/checker/ChannelPartners';
 import CheckerInvoices from '@/pages/checker/Invoices';
