@@ -57,13 +57,16 @@ export default function OTPPage() {
     setLoading(true);
     try {
       const res = await axios.post(`${API}/auth/verify-otp`, { session_id: sessionId, otp: otpStr });
-      login(res.data.token, res.data.user);
-      sessionStorage.removeItem('scf_session_id');
-      sessionStorage.removeItem('scf_login_email');
       const role = res.data.user.role;
-      if (role === 'anchor_maker') navigate('/maker/dashboard');
-      else if (role === 'anchor_checker') navigate('/checker/dashboard');
-      else navigate('/cp/dashboard');
+      const dest = role === 'anchor_maker' ? '/maker/dashboard'
+        : role === 'anchor_checker' ? '/checker/dashboard' : '/cp/dashboard';
+      login(res.data.token, res.data.user);
+      navigate(dest, { replace: true });
+      // Clear session after navigation
+      setTimeout(() => {
+        sessionStorage.removeItem('scf_session_id');
+        sessionStorage.removeItem('scf_login_email');
+      }, 200);
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Invalid OTP');
     } finally {
