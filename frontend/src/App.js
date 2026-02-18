@@ -63,6 +63,7 @@ function AppRoutes() {
       <Route path="/cp/dashboard" element={<ProtectedRoute allowedRoles={['channel_partner']}><CPDashboard /></ProtectedRoute>} />
       <Route path="/cp/programs" element={<ProtectedRoute allowedRoles={['channel_partner']}><CPPrograms /></ProtectedRoute>} />
       <Route path="/cp/invoices" element={<ProtectedRoute allowedRoles={['channel_partner']}><CPInvoices /></ProtectedRoute>} />
+      <Route path="/cp/settings" element={<ProtectedRoute allowedRoles={['channel_partner']}><CPDashboard /></ProtectedRoute>} />
 
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
