@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
 import axios from 'axios';
 import { useAuth } from '@/contexts/AuthContext';
-import { FileText, Users, Clock, CheckCircle, TrendingUp, AlertTriangle } from 'lucide-react';
+import { FileText, Users, Clock, CheckCircle, TrendingUp, IndianRupee } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const API = process.env.REACT_APP_BACKEND_URL + '/api';
@@ -11,96 +11,68 @@ export default function CheckerDashboard() {
   const { token } = useAuth();
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
-  const [partners, setPartners] = useState([]);
+  const [programs, setPrograms] = useState([]);
   const headers = { Authorization: `Bearer ${token}` };
 
   useEffect(() => {
     axios.get(`${API}/stats`, { headers }).then(r => setStats(r.data)).catch(() => {});
-    axios.get(`${API}/channel-partners`, { headers }).then(r => setPartners(r.data)).catch(() => {});
+    axios.get(`${API}/programs`, { headers }).then(r => setPrograms(r.data)).catch(() => {});
   }, []);
-
-  const statCards = [
-    { label: 'Total Channel Partners', value: partners.length || '—', sub: 'Active partnerships', icon: <Users size={18} />, color: '#ede9fe', iconColor: '#6d28d9' },
-    { label: 'Total Invoices', value: stats?.total_invoices ?? '—', sub: 'All time', icon: <FileText size={18} />, color: '#fef3c7', iconColor: '#d97706' },
-    { label: 'Pending My Approval', value: stats?.pending_checker ?? '—', sub: 'Awaiting checker review', icon: <Clock size={18} />, color: '#fef3c7', iconColor: '#d97706' },
-    { label: 'Approved (L1)', value: stats?.approved_l1 ?? '—', sub: 'Approved by checker', icon: <CheckCircle size={18} />, color: '#d1fae5', iconColor: '#059669' },
-  ];
 
   return (
     <Layout>
       <div data-testid="checker-dashboard">
-        <div className="scf-stats-grid">
-          {statCards.map(c => (
-            <div className="scf-stat-card" key={c.label}>
-              <div className="scf-stat-icon" style={{ background: c.color }}><span style={{ color: c.iconColor }}>{c.icon}</span></div>
-              <div className="scf-stat-label">{c.label}</div>
-              <div className="scf-stat-value">{c.value}</div>
-              <div className="scf-stat-sub">{c.sub}</div>
+        {/* Summary stat strip */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 22 }}>
+          {[
+            { label: 'Total SCF Limit', value: '₹200 Cr', icon: <IndianRupee size={16} />, bg: '#ede9fe', ic: '#6d28d9' },
+            { label: 'Active Programs', value: programs.length, icon: <TrendingUp size={16} />, bg: '#d1fae5', ic: '#059669' },
+            { label: 'Total Invoices', value: stats?.total_invoices ?? '—', icon: <FileText size={16} />, bg: '#fef3c7', ic: '#d97706' },
+            { label: 'Pending Approval', value: stats?.pending_checker ?? '—', icon: <Clock size={16} />, bg: '#fef3c7', ic: '#d97706' },
+            { label: 'Approved (L1)', value: stats?.approved_l1 ?? '—', icon: <CheckCircle size={16} />, bg: '#d1fae5', ic: '#059669' },
+          ].map(c => (
+            <div key={c.label} className="scf-stat-card" style={{ padding: '14px 16px' }}>
+              <div className="scf-stat-icon" style={{ background: c.bg, width: 32, height: 32, marginBottom: 8 }}>
+                <span style={{ color: c.ic }}>{c.icon}</span>
+              </div>
+              <div className="scf-stat-value" style={{ fontSize: 20 }}>{c.value}</div>
+              <div className="scf-stat-label" style={{ fontSize: 11 }}>{c.label}</div>
             </div>
           ))}
         </div>
 
-        {/* Quick Actions */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 20 }}>
-          <div className="scf-table-card" style={{ padding: 24, cursor: 'pointer' }} onClick={() => navigate('/checker/invoices')} data-testid="quick-action-invoices">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              <div style={{ width: 48, height: 48, background: '#fef3c7', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <FileText size={22} style={{ color: '#d97706' }} />
-              </div>
-              <div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: '#1e1b4b' }}>Review Invoices</div>
-                <div style={{ fontSize: 13, color: '#6b7280', marginTop: 2 }}>Approve or reject pending invoices</div>
-              </div>
-            </div>
-          </div>
-          <div className="scf-table-card" style={{ padding: 24, cursor: 'pointer' }} onClick={() => navigate('/checker/channel-partners')} data-testid="quick-action-partners">
-            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-              <div style={{ width: 48, height: 48, background: '#d1fae5', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Users size={22} style={{ color: '#059669' }} />
-              </div>
-              <div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: '#1e1b4b' }}>View Channel Partners</div>
-                <div style={{ fontSize: 13, color: '#6b7280', marginTop: 2 }}>Manage partner accounts & limits</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Recent Channel Partners */}
+        {/* Programs Overview */}
         <div className="scf-table-card">
           <div className="scf-table-header">
             <div>
-              <div className="scf-table-title">Channel Partners Overview</div>
-              <div className="scf-table-subtitle">Limit utilization summary</div>
+              <div className="scf-table-title">Active Programs Overview</div>
+              <div className="scf-table-subtitle">SCF programs and limit utilization</div>
             </div>
+            <span style={{ fontSize: 12, color: '#6d28d9', cursor: 'pointer', fontWeight: 500 }} onClick={() => navigate('/checker/programs')}>View All →</span>
           </div>
           <div className="scf-table-wrap">
             <table className="scf-table">
               <thead>
-                <tr>
-                  <th>Partner Name</th>
-                  <th>Type</th>
-                  <th>City</th>
-                  <th>Sanctioned Limit</th>
-                  <th>Utilized</th>
-                  <th>Available</th>
-                  <th>Status</th>
-                </tr>
+                <tr><th>Channel Partner</th><th>Product</th><th>PTE Days</th><th>Total Limit</th><th>Utilized</th><th>Available</th><th>ROI</th><th>Status</th></tr>
               </thead>
               <tbody>
-                {partners.slice(0, 5).map(p => (
-                  <tr key={p.id}>
-                    <td style={{ fontWeight: 500 }}>{p.name}</td>
-                    <td><span className={`scf-badge ${p.type === 'Dealer' ? 'badge-checker' : 'badge-credit'}`}>{p.type}</span></td>
-                    <td>{p.city}</td>
-                    <td className="scf-amount">₹{(p.sanctioned_limit / 100000).toFixed(0)} L</td>
+                {programs.map((p, i) => (
+                  <tr key={i}>
+                    <td style={{ fontWeight: 500 }}>{p.channel_partner}</td>
+                    <td><span className={`scf-badge ${p.product === 'Dealer Finance' ? 'badge-checker' : 'badge-credit'}`}>{p.product}</span></td>
+                    <td>{p.pte_days} days</td>
+                    <td className="scf-amount">₹{(p.total_limit / 100000).toFixed(0)} L</td>
                     <td>₹{(p.utilized / 100000).toFixed(0)} L</td>
                     <td style={{ color: '#059669', fontWeight: 500 }}>₹{(p.available / 100000).toFixed(0)} L</td>
+                    <td>{p.roi}%</td>
                     <td><span className={`scf-badge ${p.status === 'Active' ? 'badge-active' : 'badge-inactive'}`}>{p.status}</span></td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+          <div style={{ padding: '10px 20px', borderTop: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 12, color: '#9ca3af' }}>Showing {programs.length} programs</span>
           </div>
         </div>
       </div>
