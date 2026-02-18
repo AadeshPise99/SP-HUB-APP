@@ -17,11 +17,16 @@ export default function OTPPage() {
   const sessionId = sessionStorage.getItem('scf_session_id');
   const email = sessionStorage.getItem('scf_login_email');
 
-  useEffect(() => {
-    if (!sessionId) navigate('/login');
-  }, [sessionId, navigate]);
-
-  if (!sessionId) return null;
+  if (!sessionId) {
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
+        <div style={{ textAlign: 'center' }}>
+          <p style={{ color: '#6b7280' }}>Session expired.</p>
+          <button className="scf-btn scf-btn-primary" onClick={() => navigate('/login')} style={{ marginTop: 10 }}>Back to Login</button>
+        </div>
+      </div>
+    );
+  }
 
   const handleOtpChange = (idx, val) => {
     if (!/^[0-9]?$/.test(val)) return;
