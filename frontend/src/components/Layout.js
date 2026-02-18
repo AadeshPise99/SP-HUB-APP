@@ -13,8 +13,9 @@ const MAKER_NAV = [
 
 const CHECKER_NAV = [
   { path: '/checker/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { path: '/checker/channel-partners', icon: Users, label: 'Channel Partners' },
-  { path: '/checker/invoices', icon: FileText, label: 'Invoice Management' },
+  { path: '/checker/programs', icon: Building2, label: 'Active Programs' },
+  { path: '/checker/invoices', icon: FileText, label: 'Invoices' },
+  { path: '/checker/lenders', icon: Landmark, label: 'Lenders' },
   { path: '/checker/settings', icon: Settings, label: 'Settings' },
 ];
 
