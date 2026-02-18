@@ -1,39 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
+import { LeadCard, OfferDetailsModal, ACTIVE_LEADS } from '@/components/LeadComponents';
+import { PlusCircle, Search, TrendingUp } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '@/contexts/AuthContext';
-import { Search } from 'lucide-react';
 
 const API = process.env.REACT_APP_BACKEND_URL + '/api';
 
 export default function MakerPrograms() {
   const { token } = useAuth();
-  const [programs, setPrograms] = useState([]);
+  const [selectedLeadId, setSelectedLeadId] = useState(null);
   const [search, setSearch] = useState('');
+  const [activeFilter, setActiveFilter] = useState('All');
   const headers = { Authorization: `Bearer ${token}` };
 
-  useEffect(() => {
-    axios.get(`${API}/programs`, { headers }).then(r => setPrograms(r.data)).catch(() => {});
-  }, []);
+  const filters = ['All', 'Offer Submitted', 'Under Review', 'Approved'];
 
-  const filtered = programs.filter(p =>
-    p.channel_partner.toLowerCase().includes(search.toLowerCase()) ||
-    p.product.toLowerCase().includes(search.toLowerCase())
-  );
-
-  const fmt = (n) => `₹${(n / 100000).toFixed(1)} L`;
-  const pct = (u, t) => Math.round((u / t) * 100);
+  const filtered = ACTIVE_LEADS.filter(l => {
+    const matchFilter = activeFilter === 'All' || l.status === activeFilter;
+    const matchSearch = !search ||
+      l.id.toLowerCase().includes(search.toLowerCase()) ||
+      l.lenders.some(lnd => lnd.name.toLowerCase().includes(search.toLowerCase())) ||
+      l.company.toLowerCase().includes(search.toLowerCase());
+    return matchFilter && matchSearch;
+  });
 
   return (
-    <Layout>
+    <Layout
+      headerActions={
+        <button className="scf-btn scf-btn-primary" data-testid="new-lead-btn-programs">
+          <PlusCircle size={15} /> + New Lead
+        </button>
+      }
+    >
       <div data-testid="maker-programs">
-        {/* Summary stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 20 }}>
+        {/* Summary */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 14, marginBottom: 20 }}>
           {[
-            { label: 'Total Programs', value: programs.length },
-            { label: 'Active', value: programs.filter(p => p.status === 'Active').length },
-            { label: 'Total Limit', value: `₹${(programs.reduce((a, p) => a + p.total_limit, 0) / 10000000).toFixed(0)} Cr` },
-            { label: 'Total Utilized', value: `₹${(programs.reduce((a, p) => a + p.utilized, 0) / 10000000).toFixed(0)} Cr` },
+            { label: 'Total Programs', value: ACTIVE_LEADS.length },
+            { label: 'Offer Submitted', value: ACTIVE_LEADS.filter(l => l.status === 'Offer Submitted').length },
+            { label: 'Under Review', value: ACTIVE_LEADS.filter(l => l.status === 'Under Review').length },
+            { label: 'Approved', value: ACTIVE_LEADS.filter(l => l.status === 'Approved').length },
           ].map(s => (
             <div key={s.label} className="scf-stat-card">
               <div className="scf-stat-label">{s.label}</div>
@@ -43,76 +50,58 @@ export default function MakerPrograms() {
         </div>
 
         <div className="scf-table-card">
-          <div className="scf-table-header">
+          <div className="scf-table-header" style={{ flexWrap: 'wrap', gap: 12 }}>
             <div>
               <div className="scf-table-title">Active Programs</div>
               <div className="scf-table-subtitle">{filtered.length} programs found</div>
             </div>
-            <div className="scf-search-wrap">
-              <Search />
-              <input
-                className="scf-search-input"
-                placeholder="Search by partner or product..."
-                value={search}
-                onChange={e => setSearch(e.target.value)}
-                data-testid="programs-search"
-              />
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              {filters.map(f => (
+                <button
+                  key={f}
+                  onClick={() => setActiveFilter(f)}
+                  style={{
+                    padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500, cursor: 'pointer',
+                    border: activeFilter === f ? '1.5px solid #6d28d9' : '1.5px solid #e5e7eb',
+                    background: activeFilter === f ? '#ede9fe' : '#fff',
+                    color: activeFilter === f ? '#5b21b6' : '#6b7280',
+                  }}
+                >
+                  {f}
+                </button>
+              ))}
+              <div className="scf-search-wrap">
+                <Search />
+                <input
+                  className="scf-search-input"
+                  placeholder="Search by ID, lender..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                  data-testid="programs-search"
+                />
+              </div>
             </div>
           </div>
 
-          <div className="scf-table-wrap">
-            <table className="scf-table">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Anchor</th>
-                  <th>Channel Partner</th>
-                  <th>Product</th>
-                  <th>PTE Days</th>
-                  <th>Total Limit</th>
-                  <th>Utilized</th>
-                  <th>Available</th>
-                  <th>Utilization %</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.map((p, i) => (
-                  <tr key={p.id}>
-                    <td style={{ color: '#9ca3af' }}>{i + 1}</td>
-                    <td style={{ fontWeight: 500 }}>{p.anchor}</td>
-                    <td style={{ fontWeight: 500 }}>{p.channel_partner}</td>
-                    <td>
-                      <span className={`scf-badge ${p.product === 'Dealer Finance' ? 'badge-checker' : 'badge-credit'}`}>
-                        {p.product}
-                      </span>
-                    </td>
-                    <td>{p.pte_days} days</td>
-                    <td className="scf-amount">{fmt(p.total_limit)}</td>
-                    <td>{fmt(p.utilized)}</td>
-                    <td style={{ color: '#059669', fontWeight: 500 }}>{fmt(p.available)}</td>
-                    <td>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <div style={{ flex: 1, height: 6, background: '#f3f4f6', borderRadius: 3 }}>
-                          <div style={{ width: `${pct(p.utilized, p.total_limit)}%`, height: '100%', background: '#7c3aed', borderRadius: 3 }}></div>
-                        </div>
-                        <span style={{ fontSize: 12, color: '#6b7280', minWidth: 32 }}>{pct(p.utilized, p.total_limit)}%</span>
-                      </div>
-                    </td>
-                    <td>
-                      <span className={`scf-badge ${p.status === 'Active' ? 'badge-active' : 'badge-inactive'}`}>
-                        {p.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div style={{ padding: '16px 20px' }}>
+            {filtered.length === 0 ? (
+              <div className="scf-empty"><TrendingUp /><h3>No programs found</h3></div>
+            ) : (
+              filtered.map(lead => (
+                <LeadCard key={lead.id} lead={lead} onViewDetails={setSelectedLeadId} />
+              ))
+            )}
           </div>
-          {filtered.length === 0 && (
-            <div className="scf-empty"><p>No programs found.</p></div>
-          )}
+
+          <div style={{ padding: '10px 20px', borderTop: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between' }}>
+            <span style={{ fontSize: 12, color: '#9ca3af' }}>Showing {filtered.length} of {ACTIVE_LEADS.length} programs</span>
+            <span style={{ fontSize: 11.5, color: '#9ca3af' }}>Data updated as of 2 hours ago</span>
+          </div>
         </div>
+
+        {selectedLeadId && (
+          <OfferDetailsModal leadId={selectedLeadId} onClose={() => setSelectedLeadId(null)} />
+        )}
       </div>
     </Layout>
   );

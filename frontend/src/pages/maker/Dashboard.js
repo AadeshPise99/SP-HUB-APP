@@ -1,112 +1,113 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '@/components/Layout';
+import { LeadCard, OfferDetailsModal, ACTIVE_LEADS } from '@/components/LeadComponents';
+import { PlusCircle, FileText, CheckCircle, Clock, TrendingUp, IndianRupee } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '@/contexts/AuthContext';
-import { TrendingUp, FileText, CheckCircle, Clock, XCircle, IndianRupee } from 'lucide-react';
 
 const API = process.env.REACT_APP_BACKEND_URL + '/api';
 
-const PROGRAMS_MOCK = [
-  { anchor: 'Tata Motors Ltd', channelPartner: 'Jagdamba Motors', product: 'Dealer Finance', pte: 30, limit: 500, utilized: 150, status: 'Active' },
-  { anchor: 'Tata Motors Ltd', channelPartner: 'Krishna Auto Dealers', product: 'Dealer Finance', pte: 45, limit: 300, utilized: 85, status: 'Active' },
-  { anchor: 'Tata Motors Ltd', channelPartner: 'Shree Ganesh Motors', product: 'Vendor Finance', pte: 60, limit: 800, utilized: 320, status: 'Active' },
-  { anchor: 'Tata Motors Ltd', channelPartner: 'Meenakshi Auto', product: 'Dealer Finance', pte: 30, limit: 250, utilized: 98, status: 'Active' },
-  { anchor: 'Tata Motors Ltd', channelPartner: 'Sunrise Vehicles', product: 'Vendor Finance', pte: 45, limit: 450, utilized: 180, status: 'Active' },
-];
-
-const fmtCr = (v) => `₹${(v / 100).toFixed(1)} Cr`;
-
 export default function MakerDashboard() {
   const { token } = useAuth();
+  const [selectedLeadId, setSelectedLeadId] = useState(null);
   const [stats, setStats] = useState(null);
+  const [activeFilter, setActiveFilter] = useState('All');
   const headers = { Authorization: `Bearer ${token}` };
 
   useEffect(() => {
     axios.get(`${API}/stats`, { headers }).then(r => setStats(r.data)).catch(() => {});
   }, []);
 
-  const statCards = [
-    { label: 'Total SCF Limit', value: '₹200 Cr', sub: 'Sanctioned by bank', icon: <IndianRupee size={18} />, color: '#ede9fe', iconColor: '#6d28d9' },
-    { label: 'Active Programs', value: '5', sub: '1 inactive', icon: <TrendingUp size={18} />, color: '#d1fae5', iconColor: '#059669' },
-    { label: 'Total Invoices', value: stats?.total_invoices ?? '—', sub: `${stats?.pending_approval ?? 0} pending approval`, icon: <FileText size={18} />, color: '#fef3c7', iconColor: '#d97706' },
-    { label: 'Approved Invoices', value: stats?.approved ?? '—', sub: `₹${((stats?.approved_amount || 0) / 10000000).toFixed(1)} Cr disbursed`, icon: <CheckCircle size={18} />, color: '#d1fae5', iconColor: '#059669' },
-  ];
+  const filters = ['All', 'Offer Submitted', 'Under Review', 'Approved'];
+  const filteredLeads = activeFilter === 'All' ? ACTIVE_LEADS : ACTIVE_LEADS.filter(l => l.status === activeFilter);
 
   return (
-    <Layout>
+    <Layout
+      headerActions={
+        <button
+          className="scf-btn scf-btn-primary"
+          style={{ gap: 6 }}
+          data-testid="new-lead-btn"
+        >
+          <PlusCircle size={15} /> + New Lead
+        </button>
+      }
+    >
       <div data-testid="maker-dashboard">
-        {/* Stats */}
-        <div className="scf-stats-grid">
-          {statCards.map(c => (
-            <div className="scf-stat-card" key={c.label}>
-              <div className="scf-stat-icon" style={{ background: c.color }}>
-                <span style={{ color: c.iconColor }}>{c.icon}</span>
-              </div>
-              <div className="scf-stat-label">{c.label}</div>
-              <div className="scf-stat-value">{c.value}</div>
-              <div className="scf-stat-sub">{c.sub}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Active Programs Summary */}
-        <div className="scf-table-card" style={{ marginBottom: 20 }}>
-          <div className="scf-table-header">
-            <div>
-              <div className="scf-table-title">Active Programs</div>
-              <div className="scf-table-subtitle">Current SCF programs</div>
-            </div>
-            <span style={{ fontSize: 12, color: '#6d28d9', cursor: 'pointer', fontWeight: 500 }}
-              onClick={() => window.location.href = '/maker/programs'}>View All →</span>
-          </div>
-          <div className="scf-table-wrap">
-            <table className="scf-table">
-              <thead>
-                <tr>
-                  <th>Channel Partner</th>
-                  <th>Product</th>
-                  <th>PTE Days</th>
-                  <th>Total Limit</th>
-                  <th>Utilized</th>
-                  <th>Available</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {PROGRAMS_MOCK.map((p, i) => (
-                  <tr key={i}>
-                    <td style={{ fontWeight: 500 }}>{p.channelPartner}</td>
-                    <td>{p.product}</td>
-                    <td>{p.pte}</td>
-                    <td className="scf-amount">₹{p.limit} L</td>
-                    <td>₹{p.utilized} L</td>
-                    <td style={{ color: '#059669', fontWeight: 500 }}>₹{p.limit - p.utilized} L</td>
-                    <td><span className="scf-badge badge-active">{p.status}</span></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Quick stats row */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
+        {/* Summary stat strip */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 22 }}>
           {[
-            { label: 'Pending Approvals', value: stats?.pending_approval ?? 0, color: '#fef3c7', text: '#92400e', icon: <Clock size={20} /> },
-            { label: 'Approved This Month', value: stats?.approved ?? 0, color: '#d1fae5', text: '#065f46', icon: <CheckCircle size={20} /> },
-            { label: 'Rejected Invoices', value: stats?.rejected ?? 0, color: '#fee2e2', text: '#991b1b', icon: <XCircle size={20} /> },
-          ].map(item => (
-            <div key={item.label} className="scf-stat-card" style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 20px' }}>
-              <div style={{ width: 44, height: 44, borderRadius: 10, background: item.color, display: 'flex', alignItems: 'center', justifyContent: 'center', color: item.text }}>
-                {item.icon}
+            { label: 'Total SCF Limit', value: '₹200 Cr', icon: <IndianRupee size={16} />, bg: '#ede9fe', ic: '#6d28d9' },
+            { label: 'Active Programs', value: ACTIVE_LEADS.length, icon: <TrendingUp size={16} />, bg: '#d1fae5', ic: '#059669' },
+            { label: 'Total Invoices', value: stats?.total_invoices ?? '—', icon: <FileText size={16} />, bg: '#fef3c7', ic: '#d97706' },
+            { label: 'Pending Approval', value: stats?.pending_approval ?? '—', icon: <Clock size={16} />, bg: '#fef3c7', ic: '#d97706' },
+            { label: 'Approved', value: stats?.approved ?? '—', icon: <CheckCircle size={16} />, bg: '#d1fae5', ic: '#059669' },
+          ].map(c => (
+            <div key={c.label} className="scf-stat-card" style={{ padding: '14px 16px' }}>
+              <div className="scf-stat-icon" style={{ background: c.bg, width: 32, height: 32, marginBottom: 8 }}>
+                <span style={{ color: c.ic }}>{c.icon}</span>
               </div>
-              <div>
-                <div style={{ fontSize: 24, fontWeight: 700, color: '#1e1b4b' }}>{item.value}</div>
-                <div style={{ fontSize: 12, color: '#6b7280' }}>{item.label}</div>
-              </div>
+              <div className="scf-stat-value" style={{ fontSize: 20 }}>{c.value}</div>
+              <div className="scf-stat-label" style={{ fontSize: 11 }}>{c.label}</div>
             </div>
           ))}
         </div>
+
+        {/* Active Programs / Ongoing Leads Journey */}
+        <div className="scf-table-card">
+          <div className="scf-table-header" style={{ flexWrap: 'wrap', gap: 12 }}>
+            <div>
+              <div className="scf-table-title">Ongoing Leads Journey</div>
+              <div className="scf-table-subtitle">Active programs and their current status</div>
+            </div>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              {filters.map(f => (
+                <button
+                  key={f}
+                  onClick={() => setActiveFilter(f)}
+                  style={{
+                    padding: '5px 12px', borderRadius: 20, fontSize: 12, fontWeight: 500, cursor: 'pointer',
+                    border: activeFilter === f ? '1.5px solid #6d28d9' : '1.5px solid #e5e7eb',
+                    background: activeFilter === f ? '#ede9fe' : '#fff',
+                    color: activeFilter === f ? '#5b21b6' : '#6b7280',
+                    transition: 'all 0.15s'
+                  }}
+                  data-testid={`filter-${f.toLowerCase().replace(/\s+/g, '-')}`}
+                >
+                  {f}
+                  {f !== 'All' && (
+                    <span style={{ marginLeft: 4, background: activeFilter === f ? '#6d28d9' : '#e5e7eb', color: activeFilter === f ? '#fff' : '#6b7280', borderRadius: '50%', width: 16, height: 16, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 10 }}>
+                      {ACTIVE_LEADS.filter(l => l.status === f).length}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ padding: '16px 20px' }}>
+            {filteredLeads.length === 0 ? (
+              <div className="scf-empty"><TrendingUp /><h3>No leads found</h3></div>
+            ) : (
+              filteredLeads.map(lead => (
+                <LeadCard key={lead.id} lead={lead} onViewDetails={setSelectedLeadId} />
+              ))
+            )}
+          </div>
+
+          <div style={{ padding: '10px 20px', borderTop: '1px solid #f3f4f6', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <span style={{ fontSize: 12, color: '#9ca3af' }}>Showing {filteredLeads.length} of {ACTIVE_LEADS.length} programs</span>
+            <span style={{ fontSize: 11.5, color: '#9ca3af' }}>Data updated as of 2 hours ago</span>
+          </div>
+        </div>
+
+        {/* Offer Details Modal */}
+        {selectedLeadId && (
+          <OfferDetailsModal
+            leadId={selectedLeadId}
+            onClose={() => setSelectedLeadId(null)}
+          />
+        )}
       </div>
     </Layout>
   );
