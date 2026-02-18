@@ -17,10 +17,11 @@ export default function OTPPage() {
   const sessionId = sessionStorage.getItem('scf_session_id');
   const email = sessionStorage.getItem('scf_login_email');
 
-  if (!sessionId) {
-    navigate('/login');
-    return null;
-  }
+  useEffect(() => {
+    if (!sessionId) navigate('/login');
+  }, [sessionId, navigate]);
+
+  if (!sessionId) return null;
 
   const handleOtpChange = (idx, val) => {
     if (!/^[0-9]?$/.test(val)) return;
