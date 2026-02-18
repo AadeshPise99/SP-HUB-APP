@@ -55,8 +55,9 @@ Rejection: `rejected_checker` (by Checker) or `rejected_cp` (by CP Admin)
 ## What's Implemented (Feb 2026)
 - [x] Login & OTP authentication with role-based routing
 - [x] Anchor Maker: Dashboard, Programs, Invoices (list + raise), Lenders
-- [x] Anchor Checker: Dashboard, Invoices (list + approve/reject), Channel Partners
+- [x] Anchor Checker: Dashboard, Programs, Invoices (list + approve/reject), Lenders (same sidebar as Maker)
 - [x] Channel Partner Admin: Dashboard, Invoices (final approval), Channel Partners (with detail modal), Repayment Ledger
+- [x] Settings page for all users: Add New User form + UI Preferences (theme, font size, density, date format)
 - [x] Dynamic invoice data with MongoDB
 - [x] Role-based access control (Maker raises, Checker L1 approves, CP final approves)
 - [x] CP limit display in invoice detail for Checker and CP Admin
