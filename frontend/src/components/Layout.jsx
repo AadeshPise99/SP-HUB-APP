@@ -27,7 +27,8 @@ const CP_NAV = [
   { path: '/cp/settings', icon: Settings, label: 'Settings' },
 ];
 
-const ROLE_LABELS = { anchor_maker: 'Maker Access', anchor_checker: 'Checker Access', channel_partner: 'Partner Access' };
+const ROLE_LABELS = { anchor_maker: 'Maker Access', anchor_checker: 'Checker Access', channel_partner: 'Corporate' };
+const SIDEBAR_TITLES = { anchor_maker: 'ANCHOR', anchor_checker: 'ANCHOR', channel_partner: 'CORPORATES' };
 
 export default function Layout({ children, headerActions }) {
   const { user, logout } = useAuth();
@@ -42,10 +43,10 @@ export default function Layout({ children, headerActions }) {
         <div className="scf-sidebar-logo">
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 30, height: 30, background: '#7c3aed', borderRadius: 6, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ color: '#fff', fontSize: 14, fontWeight: 700 }}>A</span>
+              <span style={{ color: '#fff', fontSize: 14, fontWeight: 700 }}>{user?.role === 'channel_partner' ? 'C' : 'A'}</span>
             </div>
             <div>
-              <div style={{ color: '#fff', fontSize: 14, fontWeight: 700 }}>ANCHOR</div>
+              <div style={{ color: '#fff', fontSize: 14, fontWeight: 700 }}>{SIDEBAR_TITLES[user?.role] || 'ANCHOR'}</div>
               <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10 }}>SCF Platform</div>
             </div>
           </div>

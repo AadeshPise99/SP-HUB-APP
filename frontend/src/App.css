@@ -521,11 +521,11 @@ table.scf-table tbody td {
 
 .scf-login-left {
   flex: 1;
-  background: #1a1563;
+  background: linear-gradient(135deg, #1a1563 0%, #2d1b69 50%, #1a1563 100%);
   position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: center;
   padding: 48px;
   overflow: hidden;
 }
@@ -533,10 +533,8 @@ table.scf-table tbody td {
 .scf-login-left-bg {
   position: absolute;
   inset: 0;
-  background-image: url('https://images.pexels.com/photos/273682/pexels-photo-273682.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940');
-  background-size: cover;
-  background-position: center;
-  opacity: 0.25;
+  background: linear-gradient(135deg, #1a1563 0%, #2d1b69 50%, #1a1563 100%);
+  opacity: 0.1;
 }
 
 .scf-login-left-content {

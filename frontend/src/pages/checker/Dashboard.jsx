@@ -5,9 +5,9 @@ import { PlusCircle, FileText, CheckCircle, Clock, TrendingUp, IndianRupee } fro
 import axios from 'axios';
 import { useAuth } from '@/contexts/AuthContext';
 
-const API = process.env.REACT_APP_BACKEND_URL + '/api';
+const API = import.meta.env.VITE_BACKEND_URL + '/api';
 
-export default function MakerDashboard() {
+export default function CheckerDashboard() {
   const { token } = useAuth();
   const [selectedLeadId, setSelectedLeadId] = useState(null);
   const [stats, setStats] = useState(null);
@@ -33,7 +33,7 @@ export default function MakerDashboard() {
         </button>
       }
     >
-      <div data-testid="maker-dashboard">
+      <div data-testid="checker-dashboard">
         {/* Summary stat strip */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 14, marginBottom: 22 }}>
           {[

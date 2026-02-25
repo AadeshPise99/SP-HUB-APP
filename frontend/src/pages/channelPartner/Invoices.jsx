@@ -5,15 +5,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 import { Search, Eye, FileText, X, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL + '/api';
+const API = import.meta.env.VITE_BACKEND_URL + '/api';
 const fmt = (n) => `₹${(n / 100000).toFixed(2)} L`;
 const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—';
 
 const STATUS_MAP = {
-  pending_checker_approval: ['badge-pending', 'Pending Checker'],
+  pending_checker_approval: ['badge-pending', 'Pending Approval'],
   approved_l1: ['badge-checker', 'Approved (L1)'],
   rejected_checker: ['badge-rejected', 'Rejected (Checker)'],
-  fully_approved: ['badge-approved', 'Fully Approved'],
+  fully_approved: ['badge-approved', 'Disbursed'],
   rejected_cp: ['badge-rejected', 'Rejected (CP)'],
 };
 const StatusBadge = ({ status }) => {
@@ -32,8 +32,8 @@ const CP_LIMITS = {
 const TABS = [
   { key: 'all', label: 'All Invoices' },
   { key: 'approved_l1', label: 'Pending My Approval' },
-  { key: 'fully_approved', label: 'Fully Approved' },
-  { key: 'pending_checker_approval', label: 'Pending Checker' },
+  { key: 'fully_approved', label: 'Disbursed' },
+  { key: 'pending_checker_approval', label: 'Pending Approval' },
   { key: 'rejected', label: 'Rejected' },
 ];
 

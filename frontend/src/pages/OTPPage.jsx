@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { Loader, ArrowLeft, ShieldCheck } from 'lucide-react';
 
-const API = process.env.REACT_APP_BACKEND_URL + '/api';
+const API = import.meta.env.VITE_BACKEND_URL + '/api';
 
 export default function OTPPage() {
   const navigate = useNavigate();
@@ -82,10 +82,10 @@ export default function OTPPage() {
   return (
     <div className="scf-login-page">
       <div className="scf-login-left">
-        <div className="scf-login-left-bg"></div>
+        <div className="scf-login-left-bg" style={{ opacity: 0.1, background: 'linear-gradient(135deg, #1a1563 0%, #2d1b69 50%, #1a1563 100%)' }}></div>
         <div className="scf-login-logo">
-          <span>AnchorPay</span>
-          <small>Supply Chain Finance Platform</small>
+          <span style={{ fontSize: 20 }}>Sourcing Partner SCF Platform</span>
+          <small>(Demo)</small>
         </div>
         <div className="scf-login-left-content">
           <h1 className="scf-login-tagline">Two-Factor<br />Authentication</h1>

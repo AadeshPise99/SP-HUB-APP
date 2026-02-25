@@ -28,7 +28,7 @@ const ACTIVE_LEADS = [
     ],
     product: 'DF',
     ageing: 12,
-    status: 'Offer Submitted',
+    status: 'Offer Expired',
   },
   {
     id: 'PSBLEAD041890',
@@ -41,7 +41,7 @@ const ACTIVE_LEADS = [
     ],
     product: 'DF',
     ageing: 42,
-    status: 'Under Review',
+    status: 'Match Found',
   },
   {
     id: 'PSBLEAD041750',
@@ -53,9 +53,9 @@ const ACTIVE_LEADS = [
       { name: 'HDFC BANK', short: 'HDFC' },
       { name: 'CENTRAL BANK OF INDIA', short: 'CBI' },
     ],
-    product: 'VF',
+    product: 'DF',
     ageing: 50,
-    status: 'Approved',
+    status: 'Opportunity',
   },
 ];
 
@@ -112,36 +112,64 @@ const OFFER_DETAILS = {
     leadId: 'PSBLEAD042121',
     product: 'DF',
     leadType: 'Program Lead',
+    stage: 'Offers',
+    status: 'Offer Expired',
+    lastStatusUpdateDate: '17-10-2025',
     lenders: [
       {
         id: 'CBI',
         name: 'CENTRAL BANK OF INDIA',
         role: 'Main Lending Partner',
-        status: 'Offer Submitted',
+        status: 'Offer Expired',
         platformId: 'LENDER0004',
-        programName: 'CBI DEALER FINANCE PROGRAM',
-        programLimit: '₹ 5,00,00,000',
-        programROI: '8.50%',
-        roiTag: 'Competitive',
-        currentBenchmark: '5.50%',
-        roiSpread: '3.00%',
-        benchmarkCode: 'MCLR - 6M',
-        penalInterest: '5.00%',
-        tenor: '60 Days',
-        interestType: 'Monthly Compounding',
-        minCPLimit: '₹ 500',
-        maxCPLimit: '₹ 50,000',
-        offerActivePeriod: '7 Days',
-        offerDate: '22-01-2026',
-        fldg: '40%',
-        fldgNote: 'Offered by Anchor Corporate',
-        gracePeriod: '3 Days',
-        stopSupply: '7 Days',
-        staleInvoice: '5 Days',
-        tnc: ['TnC 1 - Minimum invoice value ₹25,000 per transaction', 'TnC 2 - All invoices must be GST compliant'],
+        programName: 'CORPORATE DF',
+        programLimit: '₹ 100,00,00,000',
+        programROI: '20.00%',
+        roiTag: null,
+        currentBenchmark: '10.00%',
+        roiSpread: '10.00%',
+        benchmarkCode: 'Others',
+        penalInterest: '10.00%',
+        tenor: '90 Days',
+        interestType: 'Monthly',
+        minCPLimit: '-',
+        maxCPLimit: '-',
+        offerActivePeriod: '1 Day',
+        offerDate: '17-10-2025',
+        fldg: 'Not Applicable',
+        fldgNote: null,
+        gracePeriod: 'Not Applicable',
+        stopSupply: 'Not Applicable',
+        staleInvoice: 'Not Applicable',
+        tnc: ['tnc'],
       },
     ],
     lastUpdated: '2 hrs ago',
+  },
+  'PSBLEAD041890': {
+    leadId: 'PSBLEAD03816',
+    product: 'DF',
+    leadType: 'Program Lead',
+    stage: 'Matches',
+    status: 'Match Found',
+    lastStatusUpdateDate: '04-07-2025',
+    matches: [
+      { matchedlendername: 'STATE BANK OF INDIA', matchedlenderpsbplatformid: 'LENDER0002' },
+      { matchedlendername: 'TATA CAPITAL LIMITED', matchedlenderpsbplatformid: 'LENDER0018' },
+      { matchedlendername: 'CENTRAL BANK OF INDIA', matchedlenderpsbplatformid: 'LENDER0004' },
+      { matchedlendername: 'ANZ BANK LIMITED', matchedlenderpsbplatformid: 'LENDER0008' },
+      { matchedlendername: 'THE HONGKONG & SHANGHAI BANKING CORPORATION LTD', matchedlenderpsbplatformid: 'LENDER0020' },
+    ],
+    lastUpdated: '14 mins ago',
+  },
+  'PSBLEAD041750': {
+    leadId: 'PSBLEAD03816',
+    product: 'DF',
+    leadType: 'Program Lead',
+    stage: 'Opportunity',
+    status: 'In Progress',
+    lastStatusUpdateDate: '04-07-2025',
+    lastUpdated: '30 mins ago',
   },
 };
 
@@ -151,6 +179,11 @@ const StatusBadge = ({ status }) => {
     'Lender Rejected': { bg: '#fee2e2', color: '#991b1b', border: '#fca5a5' },
     'Under Review': { bg: '#dbeafe', color: '#1e40af', border: '#93c5fd' },
     'Approved': { bg: '#d1fae5', color: '#065f46', border: '#6ee7b7' },
+    'Match Selected': { bg: '#ede9fe', color: '#5b21b6', border: '#c4b5fd' },
+    'Match Found': { bg: '#ede9fe', color: '#5b21b6', border: '#c4b5fd' },
+    'Opportunity': { bg: '#fef3c7', color: '#92400e', border: '#fcd34d' },
+    'In Progress': { bg: '#dbeafe', color: '#1e40af', border: '#93c5fd' },
+    'Offer Expired': { bg: '#fee2e2', color: '#991b1b', border: '#fca5a5' },
   };
   const s = styles[status] || { bg: '#f3f4f6', color: '#374151', border: '#e5e7eb' };
   return (
@@ -164,6 +197,11 @@ const OfferDetailsModal = ({ leadId, onClose }) => {
   const details = OFFER_DETAILS[leadId];
   if (!details) return null;
 
+  // Check if this is a "matches" type lead
+  const isMatchesView = details.matches && details.matches.length > 0;
+  // Check if this is a simple status view (no lenders, no matches)
+  const isSimpleStatusView = !details.lenders && !details.matches;
+
   return (
     <div className="scf-modal-overlay" onClick={onClose}>
       <div
@@ -175,7 +213,9 @@ const OfferDetailsModal = ({ leadId, onClose }) => {
         <div style={{ background: '#1a1563', padding: '18px 24px', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#fff' }}>Offer Details: {details.leadId}</h3>
+              <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: '#fff' }}>
+                Lead Details: {details.leadId}
+              </h3>
               <span style={{ background: '#3730a3', color: '#c7d2fe', padding: '2px 10px', borderRadius: 4, fontSize: 11, fontWeight: 600 }}>{details.product}</span>
               <span style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)', padding: '2px 10px', borderRadius: 4, fontSize: 11 }}>{details.leadType}</span>
             </div>
@@ -189,9 +229,84 @@ const OfferDetailsModal = ({ leadId, onClose }) => {
           </button>
         </div>
 
-        {/* Lender Sections */}
-        <div style={{ padding: '0 0 80px' }}>
-          {details.lenders.map((lender, idx) => (
+        {/* Simple Status View (Opportunity, Offer Expired, etc.) */}
+        {isSimpleStatusView ? (
+          <div style={{ padding: '24px' }}>
+            {/* Lead Info Summary */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+              <div>
+                <div style={{ fontSize: 10.5, color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', marginBottom: 3 }}>Stage</div>
+                <div style={{ fontSize: 13.5, color: '#1f2937', fontWeight: 500 }}>{details.stage}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 10.5, color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', marginBottom: 3 }}>Status</div>
+                <StatusBadge status={details.status} />
+              </div>
+              <div>
+                <div style={{ fontSize: 10.5, color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', marginBottom: 3 }}>Last Updated</div>
+                <div style={{ fontSize: 13.5, color: '#1f2937', fontWeight: 500 }}>{details.lastStatusUpdateDate}</div>
+              </div>
+            </div>
+          </div>
+        ) : isMatchesView ? (
+          <div style={{ padding: '24px' }}>
+            {/* Lead Info Summary */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+              <div>
+                <div style={{ fontSize: 10.5, color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', marginBottom: 3 }}>Stage</div>
+                <div style={{ fontSize: 13.5, color: '#1f2937', fontWeight: 500 }}>{details.stage}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 10.5, color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', marginBottom: 3 }}>Status</div>
+                <StatusBadge status={details.status} />
+              </div>
+              <div>
+                <div style={{ fontSize: 10.5, color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', marginBottom: 3 }}>Last Updated</div>
+                <div style={{ fontSize: 13.5, color: '#1f2937', fontWeight: 500 }}>{details.lastStatusUpdateDate}</div>
+              </div>
+            </div>
+
+            {/* Matches Table - Lender Code and Lender Name only */}
+            <div style={{ border: '2px solid #1a1563', borderRadius: 8, overflow: 'hidden' }}>
+              {/* Table Header */}
+              <div style={{ background: '#1a1563', display: 'grid', gridTemplateColumns: '50px 1fr 1fr', padding: 0 }}>
+                <div style={{ padding: '14px 16px' }}></div>
+                <div style={{ padding: '14px 16px', color: '#fff', fontSize: 13, fontWeight: 600, textAlign: 'center' }}>Lender Code</div>
+                <div style={{ padding: '14px 16px', color: '#fff', fontSize: 13, fontWeight: 600, textAlign: 'center' }}>Lender Name</div>
+              </div>
+              {/* Table Rows */}
+              {details.matches.map((match, idx) => (
+                <div key={match.matchedlenderpsbplatformid} style={{ display: 'grid', gridTemplateColumns: '50px 1fr 1fr', borderBottom: idx < details.matches.length - 1 ? '1px solid #e5e7eb' : 'none', background: '#fff' }}>
+                  <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <span style={{
+                      width: 28,
+                      height: 28,
+                      borderRadius: '50%',
+                      background: '#1a1563',
+                      color: '#fff',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      {idx + 1}
+                    </span>
+                  </div>
+                  <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#1f2937', fontWeight: 500 }}>
+                    {match.matchedlenderpsbplatformid}
+                  </div>
+                  <div style={{ padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, color: '#1f2937', fontWeight: 500 }}>
+                    {match.matchedlendername}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          /* Lender Sections - Original View */
+          <div style={{ padding: '0 0 80px' }}>
+            {details.lenders && details.lenders.map((lender, idx) => (
             <div key={lender.id} style={{ borderBottom: '6px solid #f4f5f9' }}>
               {/* Lender Header */}
               <div style={{ padding: '18px 24px', background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #f3f4f6' }}>
@@ -317,7 +432,8 @@ const OfferDetailsModal = ({ leadId, onClose }) => {
               </div>
             </div>
           ))}
-        </div>
+          </div>
+        )}
 
         {/* Footer */}
         <div style={{ position: 'sticky', bottom: 0, background: '#fff', borderTop: '1px solid #e5e7eb', padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -341,6 +457,11 @@ const LeadCard = ({ lead, onViewDetails }) => {
     'Offer Submitted': { bg: '#fef9c3', color: '#854d0e', border: '#fde047' },
     'Under Review': { bg: '#dbeafe', color: '#1e40af', border: '#93c5fd' },
     'Approved': { bg: '#d1fae5', color: '#065f46', border: '#6ee7b7' },
+    'Match Selected': { bg: '#ede9fe', color: '#5b21b6', border: '#c4b5fd' },
+    'Match Found': { bg: '#ede9fe', color: '#5b21b6', border: '#c4b5fd' },
+    'Opportunity': { bg: '#fef3c7', color: '#92400e', border: '#fcd34d' },
+    'In Progress': { bg: '#dbeafe', color: '#1e40af', border: '#93c5fd' },
+    'Offer Expired': { bg: '#fee2e2', color: '#991b1b', border: '#fca5a5' },
   };
   const sc = statusColors[lead.status] || statusColors['Under Review'];
   const productColors = { 'DF': '#dbeafe', 'VF': '#fce7f3' };
